@@ -162,20 +162,73 @@
   </div>
 </div>
 <!-- END - Datos -->
- 
-      <!-- BEGIN - Gráficos -->
-      <div class="row-span-1 grid gap-6 mb-8 md:grid-cols-12">
-        <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800">
-          <h4 class="mb-4 font-semibold text-gray-800 dark:text-gray-300">
-            Título del gráfico
-          </h4>
-          <canvas id="line"></canvas>
-        </div>
-      </div>
-      <!-- END - Gráficos -->
 
+<!-- BEGIN - Gráficos -->
+<div class="row-span-1 grid gap-6 mb-8 md:grid-cols-1">
+  <div class="min-w-0 p-6 bg-white rounded-lg shadow-xs dark:bg-gray-800">
+    <h4 class="mb-6 font-semibold text-gray-800 dark:text-gray-300 text-lg">
+      📊 Respuestas por día
+    </h4>
+    
+    <!-- Información adicional -->
+    <div class="mb-4 text-sm text-gray-600 dark:text-gray-400">
+      <p>Muestra la cantidad de respuestas recibidas por día</p>
     </div>
-
+    
+    <!-- Container del gráfico con altura fija -->
+    <div class="relative" style="height: 400px;">
+      <canvas id="line"></canvas>
+    </div>
+    
+    <!-- Estadísticas rápidas debajo del gráfico -->
+    <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+      <div class="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+        <span>Total de días con respuestas: <strong id="days-with-responses">-</strong></span>
+        <span>Promedio por día: <strong id="average-per-day">-</strong></span>
+        <span>Día con más respuestas: <strong id="peak-day">-</strong></span>
+      </div>
+    </div>
   </div>
-</main>
-<!-- Falta el script para los gráficos, ponerlo despues-->
+</div>
+<!-- END - Gráficos -->
+
+<!-- Scripts para el gráfico -->
+{{ chart_labels|json_script:"chart-labels" }}
+{{ chart_data|json_script:"chart-data" }}
+<script>
+// Pasar datos de Django a JavaScript
+const chartLabels = JSON.parse(document.getElementById('chart-labels').textContent);
+const chartDataValues = JSON.parse(document.getElementById('chart-data').textContent);
+
+window.chartData = {
+    labels: chartLabels,
+    data: chartDataValues
+};
+
+// Calcular estadísticas rápidas
+document.addEventListener('DOMContentLoaded', function() {
+    if (window.chartData && window.chartData.data.length > 0) {
+        const data = window.chartData.data;
+        const labels = window.chartData.labels;
+        
+        // Días con respuestas (días donde hay más de 0 respuestas)
+        const daysWithResponses = data.filter(value => value > 0).length;
+        
+        // Promedio por día
+        const total = data.reduce((sum, value) => sum + value, 0);
+        const average = total / data.length;
+        
+        // Día con más respuestas
+        const maxValue = Math.max(...data);
+        const maxIndex = data.indexOf(maxValue);
+        const peakDay = labels[maxIndex] || '-';
+        
+        // Actualizar elementos
+        document.getElementById('days-with-responses').textContent = daysWithResponses;
+        document.getElementById('average-per-day').textContent = average.toFixed(1);
+        document.getElementById('peak-day').textContent = maxValue > 0 ? `${peakDay} (${maxValue})` : '-';
+    }
+});
+
+console.log('Datos del gráfico cargados:', window.chartData);
+</script>
