@@ -124,7 +124,8 @@ async function cargarDatosLineas() {
   console.log('=== CARGANDO DATOS PARA GRÁFICO DE LÍNEAS ===');
   
   try {
-    const respuesta = await fetch("http://mtorresg.pythonanywhere.com/landing/api/index/?format=json");
+    // CAMBIO AQUÍ: Usar el proxy local en lugar de la URL externa
+    const respuesta = await fetch("/api/proxy/");
     
     if (!respuesta.ok) {
       throw new Error(`HTTP error! status: ${respuesta.status}`);
