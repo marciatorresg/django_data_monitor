@@ -66,7 +66,7 @@ def index(request):
     # Calcular indicadores ajustados a tu estructura de datos
     total_responses = len(posts)
     
-    # Nombres únicos (ya que no tienes email, usamos nombre como identificador)
+    # Nombres distintos
     nombres = [post.get('nombre', '') for post in posts if post.get('nombre')]
     unique_names = len(set(filter(None, nombres)))  # Filtrar nombres vacíos
     
@@ -75,11 +75,10 @@ def index(request):
     wants_more_info = sum(1 for post in posts 
                          if post.get('motivo', '').lower() in ['consulta', 'cotización', 'cotizacion'])
     
-    # Tipos de motivos únicos (fuentes distintas)
+    # Tipos de motivos distintos
     motivos = [post.get('motivo', '') for post in posts if post.get('motivo')]
     unique_motivos = len(set(filter(None, motivos)))  # Filtrar motivos vacíos
     
-    # Última respuesta (timestamp más reciente)
     # Buscar en 'timestamp' primero, luego en 'fecha'
     timestamps = []
     for post in posts:
