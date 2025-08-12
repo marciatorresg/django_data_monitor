@@ -1,34 +1,68 @@
 /**
  * For usage, visit Chart.js docs https://www.chartjs.org/docs/latest/
  */
-const barConfig = {
-  type: 'bar',
-  data: {
-    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-    datasets: [
-      {
-        label: 'Shoes',
-        backgroundColor: '#0694a2',
-        // borderColor: window.chartColors.red,
-        borderWidth: 1,
-        data: [-3, 14, 52, 74, 33, 90, 70],
+
+async function cargarDatos() {
+  try {
+    const respuesta = await fetch("http://mtorresg.pythonanywhere.com/landing/api/index/?format=json");
+    const datos = await respuesta.json();
+
+    // Transformar datos del JSON
+    const entradas = Object.values(datos);
+    
+    // Llenar tabla
+    const tablaBody = document.querySelector("#tabla-datos tbody");
+    tablaBody.innerHTML = ""; // Limpiar antes de insertar
+    entradas.forEach(item => {
+      const fila = document.createElement("tr");
+      fila.innerHTML = `
+        <td>${item.fecha || item.timestamp || ""}</td>
+        <td>${item.mensaje}</td>
+        <td>${item.motivo}</td>
+        <td>${item.nombre}</td>
+      `;
+      tablaBody.appendChild(fila);
+    });
+
+    // Agrupar datos por motivo para el gráfico
+    const motivos = {};
+    entradas.forEach(item => {
+      motivos[item.motivo] = (motivos[item.motivo] || 0) + 1;
+    });
+
+    const labels = Object.keys(motivos);
+    const valores = Object.values(motivos);
+
+    // Configurar gráfico
+    const barConfig = {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: 'Cantidad por motivo',
+            backgroundColor: '#0694a2',
+            borderWidth: 1,
+            data: valores,
+          }
+        ],
       },
-      {
-        label: 'Bags',
-        backgroundColor: '#7e3af2',
-        // borderColor: window.chartColors.blue,
-        borderWidth: 1,
-        data: [66, 33, 43, 12, 54, 62, 84],
-      },
-    ],
-  },
-  options: {
-    responsive: true,
-    legend: {
-      display: false,
-    },
-  },
+      options: {
+        responsive: true,
+        legend: { display: false }
+      }
+    };
+
+    const barsCtx = document.getElementById('bars');
+    window.myBar = new Chart(barsCtx, barConfig);
+
+  } catch (error) {
+    console.error("Error cargando datos:", error);
+  }
 }
 
-const barsCtx = document.getElementById('bars')
-window.myBar = new Chart(barsCtx, barConfig)
+// Cargar al iniciar
+cargarDatos();
+
+// Actualizar cada 10 segundos
+setInterval(cargarDatos, 10000);
