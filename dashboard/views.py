@@ -3,7 +3,9 @@ import requests
 from django.conf import settings
 from collections import Counter, defaultdict
 from datetime import datetime, timedelta
+from django.contrib.auth.decorators import login_required
 
+@login_required
 def index(request):
     try:
         # Consumir tu API de PythonAnywhere

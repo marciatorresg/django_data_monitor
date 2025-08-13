@@ -73,8 +73,19 @@ TEMPLATES = [
 WSGI_APPLICATION = 'backend_analytics_server.wsgi.application'
 
 
-CSRF_TRUSTED_ORIGINS = ["http://127.0.0.1:8000"]
+CSRF_TRUSTED_ORIGINS = [
+  "https://*.app.github.dev", # Solo si utiliza Codespacespython manage.py runserver  
+  "https://localhost:8000",
+  "http://127.0.0.1:8000"
+]
+ALLOWED_HOSTS = [
+  "*",
+]
+# Fallo: acceso sin autenticación
+LOGIN_URL = '/login/'
 
+# Éxito: luego de autenticación exitosa
+LOGIN_REDIRECT_URL = '/'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
