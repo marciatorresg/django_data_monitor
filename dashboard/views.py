@@ -3,9 +3,10 @@ import requests
 from django.conf import settings
 from collections import Counter, defaultdict
 from datetime import datetime, timedelta
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 
 @login_required
+@permission_required('dashboard.index_viewer', raise_exception=True)
 def index(request):
     try:
         # Consumir tu API de PythonAnywhere
